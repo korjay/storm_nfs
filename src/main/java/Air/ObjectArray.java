@@ -12,6 +12,8 @@ public class ObjectArray implements Serializable{
     private static int flag=0;
     public int num = 0;
     public static long startTime = 0;
+    public static long startGlobalTime = 0;
+
 
     public void setValue(Object[] obj){
         ObjArr=obj;
@@ -46,6 +48,10 @@ public class ObjectArray implements Serializable{
     public long getStartTime(){return startTime;}
 
     public long getTime(){return System.currentTimeMillis()-startTime; }
+
+    public void setStartGlobalTime(long t) {startGlobalTime = t;}
+
+    public long getStartGlobalTime(){return startGlobalTime;}
 
 
 }

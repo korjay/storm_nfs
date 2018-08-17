@@ -67,15 +67,23 @@ public class No2Bolt extends BaseRichBolt {
             ground.setValue((Object[])tuple.getValueByField("ground_data"));
             ground.setNum((Integer)tuple.getValueByField("num"));
             ground.setStartTime((Long)tuple.getValueByField("time"));
+            ground.setStartGlobalTime((Long)tuple.getValueByField("globaltime"));
 //        ground.setValue((Object[])tuple.getValueByField("ground_data"));
             System.out.print("@@@NO Step 2 execute Start @@@");
 
 
         if(ground.getFlag() == 1){
-            Object[] result_step1_3 = ground.getValue();
+            int i = ground.getNum();
+            Object[] result_step1_2 = ground.getValue();
+            Object[] result_step1_3 = airMap.step1_3(1, result_step1_2[1],
+                                result_step1_2[3], result_step1_2[4], i);
             System.out.println("**** step1_3 tuple read ok ****");
+            ground.setValue(result_step1_3);
+            this.collector.emit(new Values(ground.getValue(), ground.getFlag(), ground.getNum()
+                    , ground.getStartTime(), ground.getStartGlobalTime()));
+            Thread.sleep(10 * 1);
 
-            result_step1_4 = airMap.step1_4(result_step1_3[0], result_step1_2[3], region_n);
+//            result_step1_4 = airMap.step1_4(result_step1_3[0], result_step1_2[3], region_n);
         }
 
         else if(ground.getFlag() == 2) {
@@ -92,8 +100,8 @@ public class No2Bolt extends BaseRichBolt {
 //            System.out.println("**** Step2_4[0] = " +result_step2_4[0]);
             System.out.println("########## spout no2 data emit##########");
             this.collector.emit(new Values(ground.getValue(), ground.getFlag(),
-                    ground.getNum(), ground.getStartTime()));
-            Thread.sleep(1000 * 1);
+                    ground.getNum(), ground.getStartTime(), ground.getStartGlobalTime()));
+            Thread.sleep(10 * 1);
              }
 
 //            result_step3 = airMap.step3(result_step1_1[0], result_step1_1[1], result_step1_1[2],
@@ -115,6 +123,6 @@ public class No2Bolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("no2", "n", "length", "time"));
+        outputFieldsDeclarer.declare(new Fields("no2", "n", "length", "time", "globaltime_2"));
     }
 }

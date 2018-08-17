@@ -83,54 +83,57 @@ public class AirSpout extends BaseRichSpout {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer){
-        outputFieldsDeclarer.declare(new Fields("ground_data", "step", "num", "time"));
+        outputFieldsDeclarer.declare(new Fields("ground_data", "step", "num", "time", "globaltime"));
     }
     public void nextTuple(){
         time = System.currentTimeMillis();
         double beginTime = System.currentTimeMillis();
         try {
-            for(int i = 0; i <= 100; i++){
+            for(int i = 0; i < 100; i++){
+                ground.setStartGlobalTime(System.currentTimeMillis());
+//                for (int size = 0; size < 2; size++) {
+                    for (int num = 0; num <= 51; num++) {
+                        if (num == 0) {
+                            System.out.println("----------------------------------------");
+                            System.out.println("region_n = " + i);
 
-                for(int num = 0; num <=51; num++) {
+                            //ground data emit
+                            ground.setFlag(1);
+                            ground.setNum(i);
+                            ground.setStartTime(System.currentTimeMillis());
+                            result_step1_2 = airMap.step1_2(5);
 
-                    if(num == 0) {
-                        System.out.println("----------------------------------------");
-                        System.out.println("region_n = " + i);
+//                        Object[] result_step1_3 = airMap.step1_3(1, result_step1_2[1],
+//                                result_step1_2[3], result_step1_2[4], i);
+                            ground.setValue(result_step1_2);
+                            System.out.println("*** Spout Emit... index :" + count);
 
-                        //ground data emit
-                        ground.setFlag(1);
-                        ground.setNum(i);
-                        ground.setStartTime(System.currentTimeMillis());
+                            this.collector.emit(new Values(ground.getValue(), ground.getFlag(), ground.getNum()
+                                    , ground.getStartTime(), ground.getStartGlobalTime()));
+                            Thread.sleep(10 * 1);
+                        } else {
+                            ground.setFlag(2);
+//                        ground.setStartTime(System.currentTimeMillis());
+                            n = new MWNumericArray(Double.valueOf(num), MWClassID.DOUBLE);
+                            Object[] result_step2_2 = airMap.step2_2(2, result_step2_1[0], n, region_n);
+                            ground.setValue(result_step2_2);
+                            count++;
+                            System.out.println("*** Spout Emit... index :" + count);
+                            ground.setStartTime(System.currentTimeMillis());
+                            this.collector.emit(new Values(ground.getValue(), ground.getFlag(),
+                                    ground.getNum(), ground.getStartTime(), ground.getStartGlobalTime()));
+                            System.out.println("########## spout no2 data emit##########");
 
-                        Object[] result_step1_3 = airMap.step1_3(1, result_step1_2[1],
-                                result_step1_2[3], result_step1_2[4], i);
-                        ground.setValue(result_step1_3);
-                        System.out.println("*** Spout Emit... index :" + count);
+                            Thread.sleep(10 * 1);
 
-                        this.collector.emit(new Values(ground.getValue(), ground.getFlag(), ground.getNum()
-                                , ground.getStartTime()));
-                        Thread.sleep(1000 * 1);
+                        }
                     }
-                    else{
-                        ground.setFlag(2);
-                        ground.setStartTime(System.currentTimeMillis());
-                        n = new MWNumericArray(Double.valueOf(num), MWClassID.DOUBLE);
-                        Object[] result_step2_2 = airMap.step2_2(2, result_step2_1[0], n, region_n);
-                        ground.setValue(result_step2_2);
-                        count++;
-                        System.out.println("*** Spout Emit... index :" + count);
-                        ground.setStartTime(System.currentTimeMillis());
-                        this.collector.emit(new Values(ground.getValue(), ground.getFlag(),
-                                ground.getNum(), ground.getStartTime()));
-                        System.out.println("########## spout no2 data emit##########");
 
-                        Thread.sleep(1000 * 1);
-
-                    }
-                }
+//                }
+                Thread.sleep(1000 * 60);
             }
 
-            Thread.sleep(1000 * 30);
+            Thread.sleep(1000 * 60);
 
 
         } catch (Exception e) {

@@ -32,7 +32,7 @@ public class AirTopology {
         //make Spout
         builder.setSpout("spout", new AirSpout(), 1);
         //make Bolt
-        builder.setBolt("no2", new No2Bolt(), 30)
+        builder.setBolt("no2", new No2Bolt(), 2)
                 .shuffleGrouping("spout");
         builder.setBolt("no2_bolt", new No2Bolt_2(), 1)
                 .shuffleGrouping("no2").setNumTasks(1);
@@ -57,7 +57,7 @@ public class AirTopology {
         Config conf = new Config();
         conf.setNumAckers(0);
         conf.setNumWorkers(32);
-        conf.setMaxSpoutPending(5000);
+        conf.setMaxSpoutPending(100000);
         StormSubmitter.submitTopology("AirTopology",conf,builder.createTopology());
         double endTime = System.currentTimeMillis();
         System.out
